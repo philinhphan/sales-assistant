@@ -38,7 +38,7 @@ def create_news_info_agent(llm):
     return create_react_agent(
         model=llm,
         tools=[search_company_news],
-        name="Microsoft",
+        name="news_info_agent",
         prompt=(
             "You are a company‑news research assistant. "
             "When the user gives a company name or ticker, "
