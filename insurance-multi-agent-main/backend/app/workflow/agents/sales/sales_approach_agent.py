@@ -7,31 +7,6 @@ import base64
 import logging
 import json
 
-
-# ---------------------------------------------------------------------
-# External data–fetching tools
-# ---------------------------------------------------------------------
-
-@tool
-def search_company_sales(company: str) -> Dict[str, Any]:
-    """Call the local /api/search endpoint and return its JSON.
-    
-    Args:
-        company: The company name, e.g. "Microsoft".
-    
-    Returns:
-        Parsed JSON from the Next.js handler. Raises for HTTP errors.
-    """
-    url = os.getenv("SEARCH_API_URL", "https://8fa1d6d81eba.ngrok-free.app/api/people")
-    try:
-        res = requests.post(url, files={"company": (None, company)})
-        res.raise_for_status()
-        return res.json()
-    except Exception as exc:                      # log + re‑raise for the agent
-        logging.exception("search_company_news failed: %s", exc)
-        raise
-
-
 def create_sales_approach_agent(llm):  # noqa: D401
     """Return a configured Sales Approach Agent.
 
@@ -40,7 +15,7 @@ def create_sales_approach_agent(llm):  # noqa: D401
     """
     return create_react_agent(
         model=llm,
-        tools=[search_company_sales],
+        tools=[],
         prompt="""You are a senior Microsoft sales strategist specializing in developing customized sales approaches for enterprise clients.
 
 Your role is to analyze the product fit assessment and create a strategic sales approach that maximizes success probability.
