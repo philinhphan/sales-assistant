@@ -9,11 +9,21 @@ import json
 
 @tool
 def get_policy_details(policy_number: str) -> Dict[str, Any]:
+    """
+    Given a lead dictionary with keys `company_name` and `country`,
+    fetch the company’s background info: overview, industry, size,
+    headquarters, and website URL.
+    """
     return None
 
 
 @tool
 def get_claimant_history(claimant_id: str) -> Dict[str, Any]:
+    """
+    Given a lead dictionary with keys `company_name` and `country`,
+    fetch the company’s background info: overview, industry, size,
+    headquarters, and website URL.
+    """
     return None
 
 def create_company_info_agent(llm):  # noqa: D401

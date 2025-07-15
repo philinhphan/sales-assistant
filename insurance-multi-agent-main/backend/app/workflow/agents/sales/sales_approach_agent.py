@@ -10,11 +10,21 @@ import json
 # TODO: Implement tooling and pass it into the agent
 @tool
 def get_news_article(article_id: str) -> Dict[str, Any]:
+    """
+    Given a lead dictionary with keys `company_name` and `country`,
+    fetch the company’s background info: overview, industry, size,
+    headquarters, and website URL.
+    """
     return None
 
 
 @tool
 def get_trending_topics() -> List[str]:
+    """
+    Given a lead dictionary with keys `company_name` and `country`,
+    fetch the company’s background info: overview, industry, size,
+    headquarters, and website URL.
+    """
     return []
 
 def create_sales_approach_agent(llm):  # noqa: D401
