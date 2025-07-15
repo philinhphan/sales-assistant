@@ -1,7 +1,6 @@
 """Workflow package exposing supervisor processing utilities."""
-from .supervisor import process_claim_with_supervisor, create_insurance_supervisor  # noqa: F401
+from .supervisor import process_lead_with_json  # noqa: F401
 
 __all__ = [
-    "process_claim_with_supervisor",
-    "create_insurance_supervisor",
+    "process_lead_with_json",
 ]

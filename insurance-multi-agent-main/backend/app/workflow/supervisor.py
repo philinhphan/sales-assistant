@@ -8,18 +8,21 @@ from __future__ import annotations
 import json
 import logging
 import os
-from typing import Any, Dict, List
+from typing import Any, Dict, List, TypedDict
 
+from app.models.output import LeadIn, LeadOut
 from dotenv import load_dotenv
 from langchain_openai import AzureChatOpenAI
-from langgraph_supervisor import create_supervisor
+from langgraph_supervisor import create_handoff_tool, create_supervisor
 
 from app.core.logging_config import configure_logging
 
-from .agents.claim_assessor import create_claim_assessor_agent
-from .agents.policy_checker import create_policy_checker_agent
-from .agents.risk_analyst import create_risk_analyst_agent
-from .agents.communication_agent import create_communication_agent
+
+from .agents.sales.company_info_agent import create_company_info_agent
+from .agents.sales.news_info_agent import create_news_info_agent
+from .agents.sales.product_fit_agent import create_product_fit_agent
+from .agents.sales.sales_approach_agent import create_sales_approach_agent
+from .agents.sales.poi_agent import create_poi_agent
 
 load_dotenv()
 
@@ -53,7 +56,7 @@ def _build_llm() -> AzureChatOpenAI:  # noqa: D401
             azure_deployment=deployment,
             api_key=api_key,
             azure_endpoint=endpoint,
-            api_version="2024-08-01-preview",
+            api_version="2024-12-01-preview",
             temperature=0.1,
         )
     
@@ -65,139 +68,130 @@ LLM = _build_llm()
 # Create specialized agents
 # ---------------------------------------------------------------------------
 
-claim_assessor = create_claim_assessor_agent(LLM)
-policy_checker = create_policy_checker_agent(LLM)
-risk_analyst = create_risk_analyst_agent(LLM)
-communication_agent = create_communication_agent(LLM)
+company_info_agent = create_company_info_agent(LLM)
+news_info_agent = create_news_info_agent(LLM)
+product_fit_agent = create_product_fit_agent(LLM)
+sales_approach_agent = create_sales_approach_agent(LLM)
+poi_agent = create_poi_agent(LLM)
 
 logger.info("✅ Specialized agents created successfully:")
-logger.info("- 🔍 Claim Assessor: Damage evaluation and cost assessment")
-logger.info("- 📋 Policy Checker: Coverage verification and policy validation")
-logger.info("- ⚠️ Risk Analyst: Fraud detection and risk scoring")
-logger.info("- 📧 Communication Agent: Customer outreach for missing information")
+logger.info("- 🔍 Company Info Agent: Retrieves company information and history")
+logger.info("- 📋 News Info Agent: Gathers relevant news articles and updates")
+logger.info("- ⚠️ Product Fit Agent: Assesses product suitability for the claim")
+logger.info("- 📈 Sales Approach Agent: Develops sales strategies based on claim data")
+logger.info("- 📍 POI Agent: Identifies points of interest related to the claim")
 
 # ---------------------------------------------------------------------------
 # Compile supervisor
 # ---------------------------------------------------------------------------
 
 
-def create_insurance_supervisor():  # noqa: D401
-    """Create and compile the supervisor coordinating all agents."""
+# --- Build the supervisor with parallel fork/join ---
+def create_sales_supervisor():
+    """
+    This supervisor will:
+      1) Fork to company_info_agent & news_info_agent in parallel
+      2) Join their outputs into product_fit_agent
+      3) Fork again to poi_agent & sales_approach_agent in parallel
+      4) Finally emit a pure JSON object matching our LeadOut schema
+    """
+    from typing_extensions import TypedDict
+
+    class LeadOut(TypedDict):
+        companyInfo:       dict
+        newsInfo:          dict
+        productFit:        dict
+        peopleOfInterest:  list
+        salesApproach:     dict
+        salesPitch:        dict
 
     supervisor = create_supervisor(
-        agents=[claim_assessor, policy_checker,
-                risk_analyst, communication_agent],
+        agents=[
+            company_info_agent,
+            news_info_agent,
+            product_fit_agent,
+            poi_agent,
+            sales_approach_agent,
+        ],
         model=LLM,
-        prompt="""You are a senior claims manager supervising a team of insurance claim processing specialists. Your role is to coordinate your team's analysis and provide comprehensive advisory recommendations to support human decision-makers.
+        prompt="""
+You are a senior sales manager orchestrating a multi-agent workflow.
 
-Your team consists of:
-1. Claim Assessor – Evaluates damage validity and cost assessment
-2. Policy Checker – Verifies coverage and policy terms
-3. Risk Analyst – Analyses fraud risk and claimant history
-4. Communication Agent – Drafts customer emails for missing information
+1) Fork in parallel to the Company Info Agent and the News Info Agent.  
+2) Once both have returned, delegate to the Product Fit Agent.  
+3) After Product Fit finishes, fork in parallel to the POI Agent and the Sales Approach Agent.  
+4) When both branches complete, output ONLY a single JSON object matching this schema:
 
-Your responsibilities:
-- Coordinate the claim-processing workflow in the optimal order
-- Ensure each specialist completes their assessment before moving on
-- Delegate to the Communication Agent whenever information is missing
-- Synthesize all team inputs into a structured advisory assessment
-- Provide clear reasoning and recommendations to empower human decision-making
+{
+  "companyInfo": {
+    "overview": "string",           // e.g. “Contoso is a 25‑year‑old software provider…”
+    "industry": "string",           // e.g. “Enterprise SaaS”
+    "size": "string",               // e.g. “500–1,000 employees”
+    "headquarters": "string",       // e.g. “Redmond, WA”
+    "website": "string"             // e.g. “https://contoso.com”
+  },
+  "newsInfo": {
+    "articles": [
+      {
+        "headline": "string",
+        "url": "string",
+        "date": "YYYY‑MM‑DD"
+      }
+    ],
+    "keyDevelopments": "string"     // short summary of top news
+  },
+  "productFit": {
+    "rationale": "string",          // why your product fits
+    "strengths": ["string"],        // e.g. [“Scales easily”, “Strong security”]
+    "limitations": ["string"]       // e.g. [“Requires Azure subscription”]
+  },
+  "peopleOfInterest": [
+    {
+      "name": "string",
+      "role": "string",
+      "interest": "string"          // why they care / pain point
+    }
+  ],
+  "salesApproach": {
+    "talkingPoints": ["string"],    // key bullet‑points to hit
+    "objectionHandling": ["string"] // anticipated pushback + responses
+  },
+  "salesPitch": {
+    "subject": "string",            // email/meeting subject line
+    "body": "string"                // full email or call script
+  }
+}
 
-Process each claim by:
-1. First assign the Claim Assessor to evaluate damage and documentation
-2. Then assign the Policy Checker to verify coverage
-3. Then assign the Risk Analyst to evaluate fraud potential
-4. If any specialist reports missing information, assign the Communication Agent to draft a customer email
-5. Compile a comprehensive assessment summary for human review
-
-End with a structured assessment in this format:
-
-ASSESSMENT_COMPLETE
-
-PRIMARY RECOMMENDATION: [APPROVE/DENY/INVESTIGATE] (Confidence: HIGH/MEDIUM/LOW)
-- Brief rationale for the recommendation
-
-SUPPORTING FACTORS:
-- Key evidence that supports the recommendation
-- Positive indicators identified by the team
-- Policy compliance confirmations
-
-RISK FACTORS:
-- Concerns or red flags identified
-- Potential fraud indicators
-- Policy coverage limitations or exclusions
-
-INFORMATION GAPS:
-- Missing documentation or data
-- Areas requiring clarification
-- Additional verification needed
-
-RECOMMENDED NEXT STEPS:
-- Specific actions for the human reviewer
-- Priority areas for further investigation
-- Suggested timeline for decision
-
-This assessment empowers human decision-makers with comprehensive AI analysis while preserving human authority over final claim decisions.""",
+Do not emit any extra text or markdown—just the JSON.
+        """,
+        parallel_tool_calls=True,           # enable true fork/join
+        response_format=(None, LeadOut),    # enforce the JSON schema
+        output_mode="last_message",         # return only the final combined response
     ).compile()
 
     return supervisor
 
 
-insurance_supervisor = create_insurance_supervisor()
-
-logger.info("✅ Insurance supervisor created successfully")
-logger.info("📊 Workflow: Supervisor → Specialists → Coordinated Decision")
-logger.info("%s", "=" * 80)
-logger.info("🚀 MULTI-AGENT INSURANCE CLAIM PROCESSING SYSTEM")
-logger.info("%s", "=" * 80)
-
-# ---------------------------------------------------------------------------
-# Public helper
-# ---------------------------------------------------------------------------
+sales_supervisor = create_sales_supervisor()
+logger.info("✅ Sales supervisor created successfully")
 
 
-def process_claim_with_supervisor(claim_data: Dict[str, Any]) -> List[Dict[str, Any]]:  # noqa: D401,E501
-    """Run the claim through the supervisor and return detailed trace information.
 
-    Returns comprehensive trace data including:
-    - Agent interactions and handoffs
-    - Tool calls and results
-    - Message history per agent
-    - Workflow state transitions
-    - Timing information
-    """
+def process_lead_with_json(lead_data: LeadIn) -> LeadOut:
+    # Kick off the workflow with a single user message
+    inputs = {
+        "messages": [
+            {
+                "role": "user",
+                "content": (
+                    "Process this lead:\n\n"
+                    f"{json.dumps(lead_data, indent=2)}"
+                ),
+            }
+        ]
+    }
 
-    logger.info("")
-    logger.info("🚀 Starting supervisor-based claim processing…")
-    logger.info("📋 Processing Claim ID: %s",
-                claim_data.get("claim_id", "Unknown"))
-    logger.info("%s", "=" * 60)
-
-    messages = [
-        {
-            "role": "user",
-            "content": (
-                "Please process this insurance claim through your team of specialists:"
-                f"\n\n{json.dumps(claim_data, indent=2)}"
-            ),
-        }
-    ]
-
-    chunks: List[Dict[str, Any]] = []
-    step_count = 0
-
-    # Enhanced streaming with detailed trace capture
-    try:
-        for chunk in insurance_supervisor.stream(
-            {"messages": messages},
-            stream_mode="updates",  # Get individual node updates instead of full state
-            debug=False  # Disable debug information temporarily
-        ):
-            step_count += 1
-            chunks.append(chunk)
-
-        logger.info("✅ Workflow completed in %d steps", step_count)
-        return chunks
-    except Exception as e:
-        logger.error("Error in workflow processing: %s", e, exc_info=True)
-        raise
+    # Run synchronously (you could also stream if you prefer)
+    result_state = sales_supervisor.invoke(inputs)
+    # The structured JSON will live in `result_state["structured_response"]`
+    return result_state["structured_response"]
