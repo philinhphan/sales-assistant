@@ -31,17 +31,6 @@ def search_company_news(company: str) -> Dict[str, Any]:
         logging.exception("search_company_news failed: %s", exc)
         raise
 
-# (You can flesh these out later or remove them if unused)
-@tool
-def get_news_article(article_id: str) -> Dict[str, Any]:
-    """Return full text for a given article id (stub)."""
-    return {}
-
-@tool
-def get_trending_topics() -> List[str]:
-    """Return a list of trending news topics (stub)."""
-    return []
-
 # ---------------------------------------------------------------------
 # Agent factory
 # ---------------------------------------------------------------------
@@ -51,7 +40,7 @@ def create_news_info_agent(llm):
     return create_react_agent(
         model=llm,
         tools=[search_company_news],
-        name="news_info_agent",
+        name="Microsoft",
         prompt=(
             "You are a company‑news research assistant. "
             "When the user gives a company name or ticker, "
