@@ -19,12 +19,14 @@
     "update-types-manual": "echo 'Go to your Supabase Dashboard > API Docs > TypeScript tab and copy the types manually'"
   },
   "dependencies": {
+    "@azure/openai": "^2.0.0",
     "@langchain/community": "^0.3.43",
     "@langchain/core": "^0.3.53",
     "@langchain/openai": "^0.5.10",
     "@supabase/ssr": "^0.6.1",
     "@supabase/supabase-js": "^2.49.8",
     "ai": "^4.3.11",
+    "autoprefixer": "^10.4.21",
     "langchain": "^0.3.24",
     "next": "15.3.1",
     "pdf-parse": "^1.1.1",
