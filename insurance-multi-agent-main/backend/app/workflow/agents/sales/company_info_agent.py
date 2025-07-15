@@ -26,6 +26,16 @@ def get_company_info_from_handelsregister(company_query: str) -> Dict[str, Any]:
         params = {
             "api_key": api_key,
             "q": company_query,
+            "feature": [
+                "related_persons",
+                "publications",
+                "financial_kpi",
+                "balance_sheet_accounts",
+                "profit_and_loss_account",
+                "news",
+                "insolvency_publications",
+                "annual_financial_statements"
+            ],
         }
         response = requests.get(url, params=params, timeout=10)
         response.raise_for_status()
