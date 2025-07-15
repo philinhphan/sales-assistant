@@ -1,9 +1,9 @@
 [project]
-name = "uv-fastapi-example"
+name = "app"
 version = "0.1.0"
 description = "Hello World FastAPI app"
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.13,<4.0"
 dependencies = [
     "fastapi[standard]>=0.112.1",
     "uvicorn[standard]>=0.29.0",
