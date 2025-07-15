@@ -22,7 +22,7 @@ def search_company_news(company: str) -> Dict[str, Any]:
     Returns:
         Parsed JSON from the Next.js handler. Raises for HTTP errors.
     """
-    url = os.getenv("SEARCH_API_URL", "http://localhost:3000/api/search")
+    url = os.getenv("SEARCH_API_URL", "https://8fa1d6d81eba.ngrok-free.app/api/search")
     try:
         res = requests.post(url, files={"company": (None, company)})
         res.raise_for_status()

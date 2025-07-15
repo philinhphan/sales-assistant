@@ -95,15 +95,6 @@ def create_sales_supervisor():
       3) Fork again to poi_agent & sales_approach_agent in parallel
       4) Finally emit a pure JSON object matching our LeadOut schema
     """
-    from typing_extensions import TypedDict
-
-    class LeadOut(TypedDict):
-        companyInfo:       dict
-        newsInfo:          dict
-        productFit:        dict
-        peopleOfInterest:  list
-        salesApproach:     dict
-        salesPitch:        dict
 
     supervisor = create_supervisor(
         agents=[
@@ -117,10 +108,19 @@ def create_sales_supervisor():
         prompt="""
 You are a senior sales manager orchestrating a multi-agent workflow.
 
-1) Fork in parallel to the Company Info Agent and the News Info Agent.  
-2) Once both have returned, delegate to the Product Fit Agent.  
-3) After Product Fit finishes, fork in parallel to the POI Agent and the Sales Approach Agent.  
-4) When both branches complete, output ONLY a single JSON object matching this schema:
+ 1) Fork in parallel:
+    - Call `transfer_to_company_info_agent` with {{lead data}}  
+    - Call `transfer_to_news_info_agent` with {{lead data}}  
+
+ 2) When both return, call `transfer_to_product_fit_agent` with:
+    {
+      "companyInfo": <company_info JSON>,
+      "newsInfo":    <news_info JSON>
+    }
+
+ 3) Then fork again:
+    - Call `transfer_to_poi_agent` with productFit JSON  
+    - Call `transfer_to_sales_approach_agent` with productFit JSON  
 
 {
   "companyInfo": {
@@ -165,7 +165,7 @@ You are a senior sales manager orchestrating a multi-agent workflow.
 Do not emit any extra text or markdown—just the JSON.
         """,
         parallel_tool_calls=True,           # enable true fork/join
-        response_format=(None, LeadOut),    # enforce the JSON schema
+        response_format=LeadOut,    # enforce the JSON schema
         output_mode="last_message",         # return only the final combined response
     ).compile()
 
