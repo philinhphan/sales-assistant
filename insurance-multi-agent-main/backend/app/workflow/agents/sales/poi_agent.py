@@ -7,25 +7,6 @@ import base64
 import logging
 import json
 
-@tool
-def get_news_article(article_id: str) -> Dict[str, Any]:
-    """
-    Given a lead dictionary with keys `company_name` and `country`,
-    fetch the company’s background info: overview, industry, size,
-    headquarters, and website URL.
-    """
-    return None
-
-
-@tool
-def get_trending_topics() -> List[str]:
-    """
-    Given a lead dictionary with keys `company_name` and `country`,
-    fetch the company’s background info: overview, industry, size,
-    headquarters, and website URL.
-    """
-    return []
-
 def create_poi_agent(llm):  # noqa: D401
     """Return a configured Person of Interest (POI) Search Agent.
 
@@ -34,7 +15,25 @@ def create_poi_agent(llm):  # noqa: D401
     """
     return create_react_agent(
         model=llm,
-        tools=[get_news_article, get_trending_topics],
-        prompt="""TODO: Create a prompt here""",
-        name="poi_agent",
+        tools=[],
+        prompt="""
+        Return a json object with the following keys:
+        - name: The name of the person of interest
+        - position: The current position or role of the person
+        - company: The company where the person works
+        - location: The geographical location of the person
+        - linkedin_url: A URL to the person's LinkedIn profile
+
+        Example:
+        {
+            "name": "John Doe",
+            "position": "Software Engineer",
+            "company": "Tech Corp",
+            "location": "San Francisco, CA",
+            "linkedin_url": "https://www.linkedin.com/in/johndoe"
+        }
+
+        Just return the example for now please!
+        """,
+        name="poi_agent",  # noqa: D401
     )
