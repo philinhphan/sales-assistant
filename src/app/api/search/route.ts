@@ -101,7 +101,7 @@ export async function POST(req: NextRequest) {
               },
               {
                 role: "user",
-                content: `Create 5 Brave/Tavily search queries to research "${company}", covering recent news, partnerships, leadership changes, hiring trends, and financial updates.`,
+                content: `Create 5 Brave/Tavily search queries to research "${company}", covering recent news, partnerships, leadership changes, hiring trends, and financial updates and only be limited to "${company}".`,
               },
             ],
             temperature: 0.0,
