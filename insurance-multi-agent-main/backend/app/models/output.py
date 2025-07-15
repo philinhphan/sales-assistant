@@ -1,56 +1,43 @@
-from datetime import datetime
-from typing import Any, Dict, List
-from pydantic import BaseModel, ConfigDict, HttpUrl
+from __future__ import annotations
+from pydantic import BaseModel, HttpUrl
+from datetime import date
+from typing import List, Literal, Dict
 
-class CompanyInfo(BaseModel):
-    model_config = ConfigDict(extra='forbid')
-    overview: str
-    industry: str
-    size: str
-    headquarters: str
+class NewsItem(BaseModel):
+    title:       str
+    description: str
+    type:        Literal["M&A", "Stock", "Success", "Partnership", "Product"]
+    date:        date
 
-class NewsArticle(BaseModel):
-    model_config = ConfigDict(extra='forbid')
-    headline: str
-    date:      datetime
-
-class NewsInfo(BaseModel):
-    model_config = ConfigDict(extra='forbid')
-    articles:        List[NewsArticle]
-    keyDevelopments: str
+class Contact(BaseModel):
+    name:       str
+    position:   str
+    department: str
+    reasoning:  str
 
 class ProductFit(BaseModel):
-    model_config = ConfigDict(extra='forbid')
-    rationale:   str
-    strengths:   List[str]
-    limitations: List[str]
+    product:    str
+    confidence: Literal["High", "Medium", "Low"]
+    reasoning:  str
 
-class PersonOfInterest(BaseModel):
-    model_config = ConfigDict(extra='forbid')
-    name:     str
-    role:     str
-    interest: str
-
-class SalesApproach(BaseModel):
-    model_config = ConfigDict(extra='forbid')
-    talkingPoints:      List[str]
-    objectionHandling:  List[str]
-
-class SalesPitch(BaseModel):
-    model_config = ConfigDict(extra='forbid')
-    subject: str
-    body:    str
-
-class LeadOut(BaseModel):
-    model_config = ConfigDict(extra='forbid')
-    companyInfo:      CompanyInfo
-    newsInfo:         NewsInfo
-    productFit:       ProductFit
-    peopleOfInterest: List[PersonOfInterest]
-    salesApproach:    SalesApproach
-    salesPitch:       SalesPitch
-
+class Company(BaseModel):
+    name:          str
+    headquarters:  str
+    employees:     str
+    coreProducts:  List[str]
+    news:          List[NewsItem]
+    productFit:    ProductFit
+    keyContacts:   List[Contact]
+    salesApproach: str
 
 class LeadIn(BaseModel):
     company_name: str
     country:      str
+
+class LeadOut(BaseModel):
+    # now just a single Company record
+    company: Company
+
+    class Config:
+        # forbid extra fields so schema has additionalProperties=false
+        extra = "forbid"

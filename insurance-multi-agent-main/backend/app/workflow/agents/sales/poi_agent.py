@@ -7,6 +7,8 @@ import base64
 import logging
 import json
 
+import requests
+
 
 # ---------------------------------------------------------------------
 # External data–fetching tools
@@ -32,7 +34,7 @@ def search_company_sales(company: str) -> Dict[str, Any]:
         raise
 
 
-def create_sales_approach_agent(llm):  # noqa: D401
+def create_poi_agent(llm):  # noqa: D401
     """Return a configured Sales Approach Agent.
 
     Args:
@@ -104,5 +106,5 @@ GUIDELINES:
 - Include quantifiable benefits where possible (percentages, time savings, etc.)
 
 Analyze the provided product fit data and generate a strategic sales approach accordingly.""",
-        name="sales_approach_agent",
+        name="poi_agent",  # noqa: D401
     )

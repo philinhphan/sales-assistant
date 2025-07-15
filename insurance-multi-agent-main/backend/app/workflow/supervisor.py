@@ -122,45 +122,102 @@ You are a senior sales manager orchestrating a multi-agent workflow.
     - Call `transfer_to_poi_agent` with productFit JSON  
     - Call `transfer_to_sales_approach_agent` with productFit JSON  
 
+4) Finally, return a JSON object like the following example:
 {
-  "companyInfo": {
-    "overview": "string",           // e.g. “Contoso is a 25‑year‑old software provider…”
-    "industry": "string",           // e.g. “Enterprise SaaS”
-    "size": "string",               // e.g. “500–1,000 employees”
-    "headquarters": "string",       // e.g. “Redmond, WA”
-    "website": "string"             // e.g. “https://contoso.com”
-  },
-  "newsInfo": {
-    "articles": [
-      {
-        "headline": "string",
-        "url": "string",
-        "date": "YYYY‑MM‑DD"
-      }
-    ],
-    "keyDevelopments": "string"     // short summary of top news
-  },
-  "productFit": {
-    "rationale": "string",          // why your product fits
-    "strengths": ["string"],        // e.g. [“Scales easily”, “Strong security”]
-    "limitations": ["string"]       // e.g. [“Requires Azure subscription”]
-  },
-  "peopleOfInterest": [
+  lufthansa: {
+  name: "Lufthansa",
+  headquarters: "Cologne, Germany",
+  employees: "110,000+",
+  coreProducts: ["Passenger Airlines", "Cargo Services", "Aircraft Maintenance", "Catering Services"],
+  news: [
     {
-      "name": "string",
-      "role": "string",
-      "interest": "string"          // why they care / pain point
+      title: "Lufthansa Group invests €2.5B in fleet modernization and digitalization",
+      description: "Major investment program includes new aircraft and comprehensive digital infrastructure upgrades to improve operational efficiency and customer experience.",
+      type: "Success",
+      date: "2024-12-05"
+    },
+    {
+      title: "New sustainability initiative targets carbon neutrality by 2030",
+      description: "Comprehensive program includes fuel efficiency optimization, sustainable aviation fuels, and carbon offset programs requiring advanced data analytics platforms.",
+      type: "Success",
+      date: "2024-11-20"
+    },
+    {
+      title: "Digital transformation of maintenance operations announced",
+      description: "Implementation of predictive maintenance systems and IoT sensors across fleet to reduce downtime and improve safety through real-time data analysis.",
+      type: "Product",
+      date: "2024-10-18"
     }
   ],
-  "salesApproach": {
-    "talkingPoints": ["string"],    // key bullet‑points to hit
-    "objectionHandling": ["string"] // anticipated pushback + responses
+  productFit: {
+    product: "Microsoft Azure IoT & Analytics",
+    confidence: "High",
+    reasoning: "Lufthansa's focus on fleet modernization, predictive maintenance, and sustainability initiatives requires robust IoT data processing and analytics capabilities that Azure specializes in."
   },
-  "salesPitch": {
-    "subject": "string",            // email/meeting subject line
-    "body": "string"                // full email or call script
+  keyContacts: [
+    {
+      name: "Christina Foerster",
+      position: "Member of Executive Board",
+      department: "Customer & Digital",
+      reasoning: "Christina oversees Lufthansa's digital transformation initiatives and would champion cloud solutions that enhance customer experience and operational efficiency."
+    },
+    {
+      name: "Detlef Kayser",
+      position: "Member of Executive Board",
+      department: "Fleet & Technology",
+      reasoning: "Responsible for fleet management and technology infrastructure. Key decision-maker for IoT and analytics solutions for aircraft maintenance and operations."
+    }
+  ],
+  salesApproach: "To align with Lufthansa’s ambitious €2.5 billion modernization and digitalization program, position Azure as the strategic backbone for their entire transformation journey. Begin by demonstrating how Azure IoT can seamlessly integrate with existing aircraft sensor data to enable predictive maintenance, reducing unscheduled downtime and maintenance costs. Emphasize advanced analytics services to optimize fuel consumption and support the carbon‑neutral 2030 goal through real‑time insights and sustainable aviation fuel tracking. Showcase scalable Azure infrastructure and global support footprint to handle large volumes of telemetry data from international operations, ensuring regulatory compliance and data sovereignty. Propose a phased pilot—integrating one hub’s maintenance workflows—to prove rapid ROI, followed by enterprise‑wide rollout. Highlight security, compliance certifications, and managed services that reduce IT overhead and accelerate time to value, reinforcing Lufthansa’s reputation for reliability and safety."
+},
+  enpal: {
+    name: "Enpal",
+    headquarters: "Berlin, Germany",
+    employees: "2,500+",
+    coreProducts: ["Solar Panel Installation", "Energy Storage Solutions", "Energy Management Software", "Green Energy Services"],
+    news: [
+      {
+        title: "Enpal secures €215M Series C funding for European expansion",
+        description: "Major funding round led by SoftBank to accelerate expansion across European markets and enhance technology platform for solar energy management.",
+        type: "Success",
+        date: "2024-11-30"
+      },
+      {
+        title: "Launch of AI-powered energy optimization platform",
+        description: "New platform uses machine learning to optimize energy consumption and storage for residential customers, requiring scalable cloud infrastructure for data processing.",
+        type: "Product",
+        date: "2024-11-12"
+      },
+      {
+        title: "Partnership with major European utilities for grid integration",
+        description: "Strategic partnerships to integrate Enpal's residential solar systems with national power grids, requiring robust data exchange and management systems.",
+        type: "Partnership",
+        date: "2024-10-25"
+      }
+    ],
+    productFit: {
+      product: "Microsoft Azure AI & Data Analytics",
+      confidence: "High",
+      reasoning: "Enpal's rapid growth, new AI-powered platform, and need for scalable infrastructure to support European expansion make Azure's AI and analytics services essential for their technology roadmap."
+    },
+    keyContacts: [
+      {
+        name: "Mario Kohle",
+        position: "Co-Founder & CEO",
+        department: "Executive",
+        reasoning: "As CEO of a fast-growing startup, Mario makes strategic technology decisions. He'll appreciate Azure's scalability and AI capabilities for Enpal's expansion plans."
+      },
+      {
+        name: "Victor Geissler",
+        position: "CTO",
+        department: "Technology",
+        reasoning: "Victor leads Enpal's technology strategy and platform development. He's the key technical decision-maker for cloud infrastructure and AI/ML capabilities."
+      }
+    ],
+    salesApproach: "Emphasize Azure's ability to scale with Enpal's rapid growth and European expansion. Highlight AI/ML capabilities for their energy optimization platform and cost-effective solutions suitable for a growing startup. Focus on innovation partnership and Microsoft's commitment to sustainability aligning with Enpal's mission."
   }
 }
+
 
 Do not emit any extra text or markdown—just the JSON.
         """,

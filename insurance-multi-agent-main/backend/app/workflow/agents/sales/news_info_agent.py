@@ -3,11 +3,14 @@ import os
 import json
 import logging
 from typing import Dict, Any, List
+from langchain_core.tools import tool
+from langgraph.prebuilt import create_react_agent
 
 import requests                                   # NEW – for HTTP call
 
 # ---------------------------------------------------------------------
 # External data–fetching tools
+# ---------------------------------------------------------------------
 # ---------------------------------------------------------------------
 
 @tool
