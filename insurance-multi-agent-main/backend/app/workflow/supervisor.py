@@ -122,46 +122,6 @@ You are a senior sales manager orchestrating a multi-agent workflow.
     - Call `transfer_to_poi_agent` with productFit JSON  
     - Call `transfer_to_sales_approach_agent` with productFit JSON  
 
-{
-  "companyInfo": {
-    "overview": "string",           // e.g. “Contoso is a 25‑year‑old software provider…”
-    "industry": "string",           // e.g. “Enterprise SaaS”
-    "size": "string",               // e.g. “500–1,000 employees”
-    "headquarters": "string",       // e.g. “Redmond, WA”
-    "website": "string"             // e.g. “https://contoso.com”
-  },
-  "newsInfo": {
-    "articles": [
-      {
-        "headline": "string",
-        "url": "string",
-        "date": "YYYY‑MM‑DD"
-      }
-    ],
-    "keyDevelopments": "string"     // short summary of top news
-  },
-  "productFit": {
-    "rationale": "string",          // why your product fits
-    "strengths": ["string"],        // e.g. [“Scales easily”, “Strong security”]
-    "limitations": ["string"]       // e.g. [“Requires Azure subscription”]
-  },
-  "peopleOfInterest": [
-    {
-      "name": "string",
-      "role": "string",
-      "interest": "string"          // why they care / pain point
-    }
-  ],
-  "salesApproach": {
-    "talkingPoints": ["string"],    // key bullet‑points to hit
-    "objectionHandling": ["string"] // anticipated pushback + responses
-  },
-  "salesPitch": {
-    "subject": "string",            // email/meeting subject line
-    "body": "string"                // full email or call script
-  }
-}
-
 Do not emit any extra text or markdown—just the JSON.
         """,
         parallel_tool_calls=True,           # enable true fork/join

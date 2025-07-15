@@ -18,8 +18,13 @@
   },
   "productFit": {
     "rationale": "string",          // why your product fits
-    "strengths": ["string"],        // e.g. [“Scales easily”, “Strong security”]
-    "limitations": ["string"]       // e.g. [“Requires Azure subscription”]
+    "painPoints": ["string"],       // specific problems your product solves
+    "productsThatAddressPain": [
+      {
+        "name": "string",            // e.g. “Contoso CRM”
+        "description": "string"      // e.g. “A CRM that helps manage customer relationships”
+      }
+    ]
   },
   "peopleOfInterest": [
     {
